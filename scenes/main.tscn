@@ -1,0 +1,167 @@
+[gd_scene load_steps=3 format=3 uid="uid://c8idle01main"]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
+[ext_resource type="Script" path="res://scripts/map/map_grid_view.gd" id="2_mapview"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main")
+
+[node name="HSplit" type="HSplitContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+split_offset = 860
+
+[node name="MapScroll" type="ScrollContainer" parent="HSplit"]
+layout_mode = 2
+horizontal_scroll_mode = 1
+vertical_scroll_mode = 2
+
+[node name="MapGridView" type="Control" parent="HSplit/MapScroll"]
+layout_mode = 2
+script = ExtResource("2_mapview")
+
+[node name="TileMapLayer" type="TileMapLayer" parent="HSplit/MapScroll/MapGridView"]
+position = Vector2(0, 0)
+
+[node name="Panel" type="PanelContainer" parent="HSplit"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PanelScroll" type="ScrollContainer" parent="HSplit/Panel"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 1
+
+[node name="VBox" type="VBoxContainer" parent="HSplit/Panel/PanelScroll"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="WoodLabel" type="Label" parent="HSplit/Panel/PanelScroll/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Wood: 0"
+
+[node name="WoodRateLabel" type="Label" parent="HSplit/Panel/PanelScroll/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Wood/s: 0"
+
+[node name="StoneLabel" type="Label" parent="HSplit/Panel/PanelScroll/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Stone: 0"
+
+[node name="StoneRateLabel" type="Label" parent="HSplit/Panel/PanelScroll/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Stone/s: 0"
+
+[node name="PowerRateLabel" type="Label" parent="HSplit/Panel/PanelScroll/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Power: 0"
+
+[node name="PlanksLabel" type="Label" parent="HSplit/Panel/PanelScroll/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Planks: 0"
+
+[node name="PlanksRateLabel" type="Label" parent="HSplit/Panel/PanelScroll/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Planks/s: 0"
+
+[node name="ShaftKitsLabel" type="Label" parent="HSplit/Panel/PanelScroll/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Shaft kits: 0"
+
+[node name="WheelKitsLabel" type="Label" parent="HSplit/Panel/PanelScroll/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Wheel kits: 0"
+
+[node name="HarvesterKitsLabel" type="Label" parent="HSplit/Panel/PanelScroll/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Harvester kits: 0"
+
+[node name="FactoryKitsLabel" type="Label" parent="HSplit/Panel/PanelScroll/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Factory kits: 0"
+
+[node name="MachineUpgradeLabel" type="Label" parent="HSplit/Panel/PanelScroll/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Machine level: 0"
+
+[node name="CraftPlanksButton" type="Button" parent="HSplit/Panel/PanelScroll/VBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "Craft plank"
+
+[node name="CraftShaftKitButton" type="Button" parent="HSplit/Panel/PanelScroll/VBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "Craft shaft kit"
+
+[node name="ShaftPlaceModeButton" type="Button" parent="HSplit/Panel/PanelScroll/VBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "Shaft place: OFF"
+
+[node name="CraftWheelKitButton" type="Button" parent="HSplit/Panel/PanelScroll/VBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "Craft wheel kit"
+
+[node name="CraftHarvesterKitButton" type="Button" parent="HSplit/Panel/PanelScroll/VBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "Craft harvester kit"
+
+[node name="CraftFactoryKitButton" type="Button" parent="HSplit/Panel/PanelScroll/VBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "Craft factory kit"
+
+[node name="MachineUpgradeButton" type="Button" parent="HSplit/Panel/PanelScroll/VBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "Upgrade machines"
+
+[node name="WheelPlaceModeButton" type="Button" parent="HSplit/Panel/PanelScroll/VBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "Wheel place: OFF"
+
+[node name="HarvesterPlaceModeButton" type="Button" parent="HSplit/Panel/PanelScroll/VBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "Harvester place: OFF"
+
+[node name="FactoryPlaceModeButton" type="Button" parent="HSplit/Panel/PanelScroll/VBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "Factory place: OFF"
+
+[node name="ExpandButton" type="Button" parent="HSplit/Panel/PanelScroll/VBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "Expand territory"
+
+[node name="HintLabel" type="Label" parent="HSplit/Panel/PanelScroll/VBox"]
+layout_mode = 2
+autowrap_mode = 3
+text = "Hint"
