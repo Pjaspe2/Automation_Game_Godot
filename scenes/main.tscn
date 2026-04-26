@@ -101,6 +101,16 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Factory kits: 0"
 
+[node name="StorageKitsLabel" type="Label" parent="HSplit/Panel/PanelScroll/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Storage kits: 0"
+
+[node name="ConveyorKitsLabel" type="Label" parent="HSplit/Panel/PanelScroll/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Conveyor kits: 0"
+
 [node name="MachineUpgradeLabel" type="Label" parent="HSplit/Panel/PanelScroll/VBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
@@ -136,10 +146,30 @@ custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 text = "Craft factory kit"
 
+[node name="CraftStorageKitButton" type="Button" parent="HSplit/Panel/PanelScroll/VBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "Craft storage kit"
+
+[node name="CraftConveyorKitButton" type="Button" parent="HSplit/Panel/PanelScroll/VBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "Craft conveyor kit"
+
 [node name="MachineUpgradeButton" type="Button" parent="HSplit/Panel/PanelScroll/VBox"]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 text = "Upgrade machines"
+
+[node name="WheelUpgradeButton" type="Button" parent="HSplit/Panel/PanelScroll/VBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "Upgrade wheels"
+
+[node name="FactoryUpgradeButton" type="Button" parent="HSplit/Panel/PanelScroll/VBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "Upgrade factories"
 
 [node name="WheelPlaceModeButton" type="Button" parent="HSplit/Panel/PanelScroll/VBox"]
 custom_minimum_size = Vector2(0, 44)
@@ -156,10 +186,25 @@ custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 text = "Factory place: OFF"
 
+[node name="StoragePlaceModeButton" type="Button" parent="HSplit/Panel/PanelScroll/VBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "Storage place: OFF"
+
+[node name="ConveyorPlaceModeButton" type="Button" parent="HSplit/Panel/PanelScroll/VBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "Conveyor place: OFF"
+
 [node name="ExpandButton" type="Button" parent="HSplit/Panel/PanelScroll/VBox"]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 text = "Expand territory"
+
+[node name="DevPickupAllButton" type="Button" parent="HSplit/Panel/PanelScroll/VBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "DEV: Pickup all placeables"
 
 [node name="HintLabel" type="Label" parent="HSplit/Panel/PanelScroll/VBox"]
 layout_mode = 2

@@ -17,13 +17,20 @@ Idle / automation prototype: authored grid map, manual gathering first, then mac
 
 ## Current behavior
 
-- Map visuals use **Kenney Tiny Town** (`tilemap_packed.png`, 2× scale). Swap sprites by editing `TinyTownAtlas.ATLAS` in `scripts/map/tiny_town_atlas.gd` (each value is atlas column/row).
-- Starter map: grass, **home** (`H`), **river** (`~`), **trees** (`T`); click trees for wood (manual multiplier vs base chop).
-- Stumps regrow to trees after a timer.
-- Small passive wood from “home” (placeholder for later crafting/base rules).
-- **Expand territory** spends wood and appends a strip with **quarry** and **copper mine** tiles. **Quarry:** click grey tiles for **stone** (per-tile cooldown). Copper mine is still visual-only.
-- **Crafting (home):** convert wood into **planks** (`PLANK_WOOD_COST` wood -> `PLANKS_PER_CRAFT` plank) from the side panel button.
-- **Automation prototype:** craft/place **water wheels** on river, build **shaft lines**, and place **harvesters** on grass next to powered shafts for passive wood gain.
+- Map visuals use **Kenney Tiny Town** (`tilemap_packed.png`, 2x base scale), with custom overlays for river flow, trees, conveyors, shafts, harvesters, and factories.
+- Starter map: grass, **home** (`H`), **river** (`~`), **trees** (`T`). Click trees for wood; stumps regrow on a timer.
+- **Expand territory** spends wood and appends a larger strip with **quarry** and **copper mine** tiles. Quarry tiles give stone on click and show cooldown shading.
+- **Crafting chain:** wood -> planks -> kits (`shaft`, `wheel`, `harvester`, `factory`, `storage`, `conveyor`).
+- **Unified logistics network:** conveyors carry both materials and power reachability. Harvesters/factories run only when their connected network reaches both:
+  - at least one storage (material sink),
+  - at least one wheel (power source adjacency target).
+- **Sub-grid placement:** logic uses `4x4` sub-cells per tile:
+  - conveyors: `1x1` sub-cell,
+  - harvesters: `1x2` sub-cells, snapped toward adjacent resource side on placement,
+  - buildings stay tile-anchored (full tile footprint in the current implementation).
+- **Factory automation:** consumes logistics wood and outputs planks; wood labels now account for actual factory usage.
+- **Machine upgrades:** separate upgrades for harvester output, wheel power, and factory throughput.
+- **QoL/dev:** conveyor click-drag placement, map zoom, pickup-all debug button, right-click pickup, and scrollable side panel.
 
 ### Balance (edit in `scripts/game_state.gd`)
 
@@ -45,13 +52,21 @@ Idle / automation prototype: authored grid map, manual gathering first, then mac
 | `WHEEL_KIT_STONE_COST` | `2.0` | Stone spent per water wheel kit. |
 | `HARVESTER_KIT_PLANK_COST` | `4.0` | Planks spent per harvester kit. |
 | `HARVESTER_KIT_STONE_COST` | `3.0` | Stone spent per harvester kit. |
-| `HARVESTER_WOOD_PER_SEC` | `0.8` | Passive wood per powered harvester. |
+| `HARVESTER_WOOD_PER_SEC` | `0.8` | Passive wood per active harvester. |
+| `HARVESTER_STONE_PER_SEC` | `0.55` | Passive stone per active stone harvester. |
+| `POWER_PER_WHEEL` | `1.0` | Base generated power per wheel (scaled by wheel upgrades). |
+| `POWER_PER_HARVESTER` | `1.0` | Power usage per active harvester. |
+| `FACTORY_WOOD_CONSUME_PER_SEC` | `1.2` | Wood consumption rate per connected factory. |
+| `FACTORY_PLANKS_PER_SEC` | `0.4` | Base plank output per connected factory. |
+| `STORAGE_WOOD_CAPACITY` | `60.0` | Logistics wood capacity per storage. |
+| `PLACEMENT_SUBDIV` | `4` | Sub-cells per tile for placement/network logic. |
 
 ### Save / load
 
 - **File:** `user://save.json` (Godot resolves this under the editor/player [user data folder](https://docs.godotengine.org/en/stable/tutorials/io/data_paths.html) for the project).
-- **Contents:** format `v` (**5** = current): `wood`, **`stone`**, **`planks`**, kit counts (`shaft/wheel/harvester`), placed object cells (`shafts/wheels/harvesters`), `territory_expanded`, full `world_map` cell grid, stump `regrow`, **`quarry_cd`** cooldowns. Saves with `v: 1..4` still load; missing fields default safely.
-- **When:** load on startup; save after chops, quarry mines, and expansion, and on quit (`_exit_tree` on `GameState`).
+- **Contents:** format `v` (**10** = current): resources, all kit counts, machine upgrade levels, logistics wood, placed world objects, sub-grid conveyors, harvester sub-grid shapes, map cells, cooldown timers, and territory expansion state.
+- **Compatibility:** older save versions are migrated forward where possible; missing fields default safely.
+- **When:** load on startup; save on gameplay-changing actions and on quit (`_exit_tree` on `GameState`).
 
 ## First implementation steps (do in order)
 
