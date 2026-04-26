@@ -33,6 +33,7 @@ const GHOST_VALID_COLOR := Color(0.25, 0.95, 0.35, 0.38)
 const GHOST_INVALID_COLOR := Color(0.95, 0.20, 0.20, 0.42)
 const RIVER_FLOW_STEP_SEC := 0.16
 const RIVER_FLOW_WAVELENGTH := 4
+const CARDINAL_DIRS: Array[Vector2i] = [Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT, Vector2i.UP]
 const TREE_COLOR := Color(0.12, 0.42, 0.16, 0.95)
 const TREE_SHADE_COLOR := Color(0.08, 0.30, 0.11, 0.95)
 const SUBGRID_LINE_COLOR := Color(1.0, 1.0, 1.0, 0.08)
@@ -317,17 +318,7 @@ func _draw() -> void:
 		draw_rect(pulse, CONVEYOR_PULSE_COLOR)
 	for c: Vector2i in _gs.get_placed_harvesters().keys():
 		var cells: Array = _gs.get_harvester_shapes().get(c, [c])
-		var min_x := 1_000_000
-		var min_y := 1_000_000
-		var max_x := -1_000_000
-		var max_y := -1_000_000
-		for sc in cells:
-			var s: Vector2i = sc
-			min_x = mini(min_x, s.x)
-			min_y = mini(min_y, s.y)
-			max_x = maxi(max_x, s.x)
-			max_y = maxi(max_y, s.y)
-		var rect := Rect2(float(min_x) * sub + sub * 0.08, float(min_y) * sub + sub * 0.08, float(max_x - min_x + 1) * sub - sub * 0.16, float(max_y - min_y + 1) * sub - sub * 0.16)
+		var rect := _bounds_rect_for_subcells(cells, sub, sub * 0.08)
 		if not _is_rect_visible(rect, view_rect):
 			continue
 		var active: bool = bool(_gs.is_harvester_active(c))
@@ -335,12 +326,6 @@ func _draw() -> void:
 		draw_rect(rect, HARVESTER_BORDER_COLOR, false, 2.0)
 		var pipe_y := rect.position.y + rect.size.y * 0.76
 		draw_line(Vector2(rect.position.x + 4.0, pipe_y), Vector2(rect.position.x + rect.size.x - 4.0, pipe_y), HARVESTER_BORDER_COLOR, 2.0)
-	if _gs.harvester_place_mode:
-		var candidates: Dictionary = _gs.get_harvester_candidate_roles()
-		for c: Vector2i in candidates.keys():
-			var rect := Rect2(c.x * d, c.y * d, d - 1.0, d - 1.0)
-			var role := str(candidates[c])
-			draw_rect(rect, HELPER_WOOD_COLOR if role == "wood" else HELPER_STONE_COLOR)
 	if (_gs.shaft_place_mode or _gs.wheel_place_mode or _gs.harvester_place_mode or _gs.factory_place_mode or _gs.storage_place_mode or _gs.conveyor_place_mode) and _has_hover_cell:
 		var world: WorldMap = _gs.world_map as WorldMap
 		if _hover_cell.x >= 0 and _hover_cell.y >= 0 and _hover_cell.x < world.width and _hover_cell.y < world.height:
@@ -355,17 +340,7 @@ func _draw() -> void:
 				valid = _gs.can_place_harvester(sub_h)
 				var cells: Array = _gs.get_harvester_preview_cells(sub_h)
 				if not cells.is_empty():
-					var min_x := 1_000_000
-					var min_y := 1_000_000
-					var max_x := -1_000_000
-					var max_y := -1_000_000
-					for sc in cells:
-						var s: Vector2i = sc
-						min_x = mini(min_x, s.x)
-						min_y = mini(min_y, s.y)
-						max_x = maxi(max_x, s.x)
-						max_y = maxi(max_y, s.y)
-					ghost = Rect2(float(min_x) * sub, float(min_y) * sub, float(max_x - min_x + 1) * sub - 1.0, float(max_y - min_y + 1) * sub - 1.0)
+					ghost = _bounds_rect_for_subcells(cells, sub, 0.0)
 			elif _gs.factory_place_mode:
 				valid = _gs.can_place_factory(_hover_cell)
 			elif _gs.storage_place_mode:
@@ -473,7 +448,6 @@ func _ensure_conveyor_flow_cache() -> void:
 func _build_conveyor_distance_field(conveyors: Dictionary, factories: Dictionary, storages: Dictionary) -> Dictionary:
 	var dist: Dictionary = {}
 	var queue: Array[Vector2i] = []
-	var dirs: Array[Vector2i] = [Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT, Vector2i.UP]
 	var sinks: Dictionary = {}
 	for sink: Vector2i in factories.keys():
 		for n: Vector2i in _tile_sink_subcells(sink):
@@ -490,7 +464,7 @@ func _build_conveyor_distance_field(conveyors: Dictionary, factories: Dictionary
 		var cur: Vector2i = queue[i]
 		i += 1
 		var cur_d: int = int(dist[cur])
-		for dir: Vector2i in dirs:
+		for dir: Vector2i in CARDINAL_DIRS:
 			var n: Vector2i = cur + dir
 			if not conveyors.has(n) or dist.has(n):
 				continue
@@ -512,12 +486,11 @@ func _tile_sink_subcells(tile: Vector2i) -> Array[Vector2i]:
 
 
 func _get_conveyor_flow_dir(cell: Vector2i, conveyors: Dictionary, dist: Dictionary) -> Vector2i:
-	var dirs: Array[Vector2i] = [Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT, Vector2i.UP]
 	if dist.has(cell):
 		var here: int = int(dist[cell])
 		var best := Vector2i.ZERO
 		var best_d := here
-		for dir: Vector2i in dirs:
+		for dir: Vector2i in CARDINAL_DIRS:
 			var n: Vector2i = cell + dir
 			if not dist.has(n):
 				continue
@@ -527,10 +500,29 @@ func _get_conveyor_flow_dir(cell: Vector2i, conveyors: Dictionary, dist: Diction
 				best = dir
 		if best != Vector2i.ZERO:
 			return best
-	for dir: Vector2i in dirs:
+	for dir: Vector2i in CARDINAL_DIRS:
 		if conveyors.has(cell + dir):
 			return dir
 	return Vector2i.ZERO
+
+
+func _bounds_rect_for_subcells(cells: Array, sub_cell_px: float, inset: float) -> Rect2:
+	var min_x := 1_000_000
+	var min_y := 1_000_000
+	var max_x := -1_000_000
+	var max_y := -1_000_000
+	for sc in cells:
+		var s: Vector2i = sc
+		min_x = mini(min_x, s.x)
+		min_y = mini(min_y, s.y)
+		max_x = maxi(max_x, s.x)
+		max_y = maxi(max_y, s.y)
+	return Rect2(
+		float(min_x) * sub_cell_px + inset,
+		float(min_y) * sub_cell_px + inset,
+		float(max_x - min_x + 1) * sub_cell_px - inset * 2.0,
+		float(max_y - min_y + 1) * sub_cell_px - inset * 2.0
+	)
 
 
 func _get_visible_map_rect() -> Rect2:

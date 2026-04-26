@@ -153,7 +153,7 @@ func _process(delta: float) -> void:
 	var power_eff := get_power_efficiency_multiplier()
 	var produced_logistics_wood := 0.0
 	for c: Vector2i in _placed_harvesters.keys():
-		if _is_machine_connected_to_storage(c) and _is_machine_connected_to_power(c):
+		if is_harvester_active(c):
 			var role := get_harvester_role(c)
 			if role == "wood":
 				produced_logistics_wood += HARVESTER_WOOD_PER_SEC * rate_mul * power_eff * delta
